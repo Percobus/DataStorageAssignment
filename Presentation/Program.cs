@@ -33,6 +33,9 @@ while (true)
     {
         case "1":
             Console.Clear();
+            Console.WriteLine("*** Tillgängliga projekt ***");
+            Console.WriteLine("Tyck 'Enter' om du vill återgå till huvudmenyn");
+            Console.WriteLine(" ");
             var projects = await projectService.GetProjectsAsync();
             foreach (var project in projects)
             {
@@ -42,29 +45,38 @@ while (true)
             // Begär projektnummer för att visa detaljer
             Console.WriteLine(" ");
             Console.Write("Ange projektnummer för att visa detaljer: ");
-            int selectedProjectNumber = int.Parse(Console.ReadLine() ?? "0");
+            string input = Console.ReadLine();
 
-            // Hämta det specifika projektet baserat på projektnumret
-            var selectedProject = await projectService.GetProjectByIdAsync(selectedProjectNumber);
-
-            if (selectedProject != null)
+            if (string.IsNullOrWhiteSpace(input))
             {
-                // Visa projektets detaljer
-                Console.Clear();
-                Console.WriteLine("*** Projektdetaljer ***");
-                Console.WriteLine(" ");
-                Console.WriteLine($"Projektnamn: {selectedProject.Name}");
-                Console.WriteLine($"Startdatum: {selectedProject.StartDate.ToShortDateString()}");
-                Console.WriteLine($"Slutdatum: {selectedProject.EndDate.ToShortDateString()}");
-                Console.WriteLine($"Kundnamn: {selectedProject.CustomerName}");
-                Console.WriteLine($"Status: {selectedProject.StatusTypeName}");
-                Console.WriteLine($"Pris per timme: {selectedProject.PricePerHour} SEK");
-                Console.WriteLine($"Totalt antal timmar: {selectedProject.TotalHours}");
-                Console.WriteLine($"Totalt pris: {selectedProject.PricePerHour * selectedProject.TotalHours} SEK");
+                // Om användaren trycker 'Enter' utan att ange något, går de tillbaka till huvudmenyn
+                break;
             }
-            else
+
+            // Annars, om ett projektnummer anges, hämta det specifika projektet baserat på projektnumret
+            if (int.TryParse(input, out int selectedProjectNumber))
             {
-                Console.WriteLine("Projektet finns inte.");
+                var selectedProject = await projectService.GetProjectByIdAsync(selectedProjectNumber);
+
+                if (selectedProject != null)
+                {
+                    // Visa projektets detaljer
+                    Console.Clear();
+                    Console.WriteLine("*** Projektdetaljer ***");
+                    Console.WriteLine(" ");
+                    Console.WriteLine($"Projektnamn: {selectedProject.Name}");
+                    Console.WriteLine($"Startdatum: {selectedProject.StartDate.ToShortDateString()}");
+                    Console.WriteLine($"Slutdatum: {selectedProject.EndDate.ToShortDateString()}");
+                    Console.WriteLine($"Kundnamn: {selectedProject.CustomerName}");
+                    Console.WriteLine($"Status: {selectedProject.StatusTypeName}");
+                    Console.WriteLine($"Pris per timme: {selectedProject.PricePerHour} SEK");
+                    Console.WriteLine($"Totalt antal timmar: {selectedProject.TotalHours}");
+                    Console.WriteLine($"Totalt pris: {selectedProject.PricePerHour * selectedProject.TotalHours} SEK");
+                }
+                else
+                {
+                    Console.WriteLine("Projektet finns inte.");
+                }
             }
 
             Console.WriteLine(" ");
@@ -180,7 +192,9 @@ while (true)
             }
 
             // Begär nya detaljer för projektet
-            Console.WriteLine($"Redigera projektet: {projectToEdit.Name}");
+            Console.WriteLine($"Du redigerar just nu: {projectToEdit.Name}");
+            Console.WriteLine("Tyck 'Enter' om du inte vill göra några förändringar");
+            Console.WriteLine(" ");
 
             Console.Write("Ange nytt projektnamn (nuvarande: " + projectToEdit.Name + "): ");
             string newProjectName = Console.ReadLine() ?? projectToEdit.Name;
@@ -240,39 +254,56 @@ while (true)
         case "4":
             Console.Clear();
             // Begär projektnummer för att radera
+            Console.WriteLine("Radera ett projekt");
+            Console.WriteLine(" ");
+            Console.WriteLine("Tryck på 'Enter' för att återvända till huvudmenyn");
+            Console.WriteLine(" ");
             Console.Write("Ange projektnummer för att radera: ");
-            int projectNumberToDelete = int.Parse(Console.ReadLine() ?? "0");
+            string projectNumberInput = Console.ReadLine()?.Trim();
 
-            // Hämta det projekt som ska raderas
-            var projectToDelete = await projectService.GetProjectByIdAsync(projectNumberToDelete);
-            if (projectToDelete == null)
+            // Om användaren trycker Enter utan att skriva något, gå tillbaka till huvudmenyn
+            if (string.IsNullOrEmpty(projectNumberInput))
             {
-                Console.WriteLine("Projektet finns inte.");
+                break; // Återgå till huvudmenyn genom att avsluta den aktuella metoden
             }
-            else
+
+            if (int.TryParse(projectNumberInput, out int projectNumberToDelete))
             {
-                // Bekräfta innan radering
-                Console.WriteLine($"Är du säker på att du vill radera projektet: {projectToDelete.Name}? (ja/nej)");
-                string confirmation = Console.ReadLine()?.ToLower();
-
-                if (confirmation == "ja")
+                // Hämta det projekt som ska raderas
+                var projectToDelete = await projectService.GetProjectByIdAsync(projectNumberToDelete);
+                if (projectToDelete == null)
                 {
-                    // Anropa en metod för att radera projektet
-                    var isDeleted = await projectService.DeleteProjectAsync(projectNumberToDelete);
-
-                    if (isDeleted)
-                    {
-                        Console.WriteLine($"Projektet {projectToDelete.Name} har raderats!");
-                    }
-                    else
-                    {
-                        Console.WriteLine("Projektet kunde inte raderas.");
-                    }
+                    Console.WriteLine("Projektet finns inte.");
                 }
                 else
                 {
-                    Console.WriteLine("Radering avbröts.");
+                    // Bekräfta innan radering
+                    Console.WriteLine($"Är du säker på att du vill radera projektet: {projectToDelete.Name}? (ja/nej)");
+                    string confirmation = Console.ReadLine()?.ToLower();
+
+                    if (confirmation == "ja")
+                    {
+                        // Anropa en metod för att radera projektet
+                        var isDeleted = await projectService.DeleteProjectAsync(projectNumberToDelete);
+
+                        if (isDeleted)
+                        {
+                            Console.WriteLine($"Projektet {projectToDelete.Name} har raderats!");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Projektet kunde inte raderas.");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Radering avbröts.");
+                    }
                 }
+            }
+            else
+            {
+                Console.WriteLine("Ogiltigt projektnummer.");
             }
 
             Console.WriteLine(" ");
