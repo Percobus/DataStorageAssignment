@@ -23,7 +23,8 @@ while (true)
     Console.WriteLine("1. Lista projekt");
     Console.WriteLine("2. Lägg upp projekt");
     Console.WriteLine("3. Redigera existerande projekt");
-    Console.WriteLine("4. Avsluta applikation");
+    Console.WriteLine("4. Radera ett projekt");
+    Console.WriteLine("5. Avsluta applikation");
     Console.WriteLine(" ");
     Console.Write("Ditt val: ");
 
@@ -235,7 +236,51 @@ while (true)
             Console.ReadKey();
             break;
 
+
         case "4":
+            Console.Clear();
+            // Begär projektnummer för att radera
+            Console.Write("Ange projektnummer för att radera: ");
+            int projectNumberToDelete = int.Parse(Console.ReadLine() ?? "0");
+
+            // Hämta det projekt som ska raderas
+            var projectToDelete = await projectService.GetProjectByIdAsync(projectNumberToDelete);
+            if (projectToDelete == null)
+            {
+                Console.WriteLine("Projektet finns inte.");
+            }
+            else
+            {
+                // Bekräfta innan radering
+                Console.WriteLine($"Är du säker på att du vill radera projektet: {projectToDelete.Name}? (ja/nej)");
+                string confirmation = Console.ReadLine()?.ToLower();
+
+                if (confirmation == "ja")
+                {
+                    // Anropa en metod för att radera projektet
+                    var isDeleted = await projectService.DeleteProjectAsync(projectNumberToDelete);
+
+                    if (isDeleted)
+                    {
+                        Console.WriteLine($"Projektet {projectToDelete.Name} har raderats!");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Projektet kunde inte raderas.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Radering avbröts.");
+                }
+            }
+
+            Console.WriteLine(" ");
+            Console.WriteLine("Tryck enter för att fortsätta...");
+            Console.ReadKey();
+            break;
+
+        case "5":
             return;
     }
 }
