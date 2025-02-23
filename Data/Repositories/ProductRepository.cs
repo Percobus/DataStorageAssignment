@@ -29,7 +29,6 @@ public class ProductRepository(DataContext context)
             return null;
 
         product.ProductName = updatedProduct.ProductName;
-        product.Price = updatedProduct.Price;
 
         _context.Products.Update(product);
         await _context.SaveChangesAsync();

@@ -9,13 +9,12 @@ public class ProjectFactory
     {
         var projectDataTransfer = new ProjectDataTransfer
         {
-            ProjectNumber = "P-" + projectEntity.Id,
+            ProjectNumber = projectEntity.ProjectNumber,
             Name = projectEntity.Title,
             StartDate = projectEntity.StartDate,
             EndDate = projectEntity.EndDate,
             CustomerId = projectEntity.CustomerId,
             CustomerName = projectEntity.Customer.CustomerName,
-            Price = projectEntity.Product.Price,
             StatusTypeName = projectEntity.Status.StatusName
         };
 
@@ -31,7 +30,6 @@ public class ProjectFactory
             EndDate = projectDataTransfer.EndDate,
             CustomerId = projectDataTransfer.CustomerId,
             StatusId = 1,
-            UserId = 0,
             ProductId = 1
         };
     }

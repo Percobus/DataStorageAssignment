@@ -1,9 +1,8 @@
-﻿
-namespace Business.Models;
+﻿namespace Business.Models;
 
 public class ProjectModel
 {
-    public string ProjectNumber { get; set; } = null!;
+    public int ProjectNumber { get; set; }
     public string Name { get; set; } = null!;
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
@@ -12,7 +11,8 @@ public class ProjectModel
     public int StatusTypeId { get; set; }
     public string StatusTypeName { get; set; } = null!;
     public decimal Price { get; set; }
-    public int EstimatedHours { get; set; }
+    public decimal PricePerHour { get; set; }
+    public int TotalHours { get; set; }
 
-    public decimal TotalPrice => Price * EstimatedHours;
+    public decimal TotalPrice => Price * TotalHours;
 }
